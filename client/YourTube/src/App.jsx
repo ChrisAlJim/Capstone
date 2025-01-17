@@ -7,7 +7,7 @@ function App() {
 
   return (
     <>
-      <h1>YourTube</h1>
+      <h1>YourTube🫵🤓</h1>
 
       <form>
         <label htmlFor="youtubeUrl"></label>
