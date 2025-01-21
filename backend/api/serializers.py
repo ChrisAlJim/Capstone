@@ -17,4 +17,4 @@ class IdeaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Idea
         fields = ["id", "title", "content", "created_at", "thinker"]
-        extra_kwargs = {"thinker", {"read_only": True}}
+        extra_kwargs = {"thinker": {"read_only": True}}
