@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../api";
+import Idea from "../components/Idea"
+import "../styles/Home.css"
 
 function Home() {
     const [ideas, setIdeas] = useState([]);
@@ -48,6 +50,9 @@ function Home() {
         <div>
             <div>
                 <h2>Ideas</h2>
+                {ideas.map((idea) => (
+                    <Idea idea={idea} onDelete={deleteIdea} key={idea.id} />
+                ))}
             </div>
             <h2>Create an Idea</h2>
             <form onSubmit={createIdea}>
