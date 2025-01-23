@@ -18,3 +18,7 @@ class IdeaSerializer(serializers.ModelSerializer):
         model = Idea
         fields = ["id", "title", "content", "created_at", "thinker"]
         extra_kwargs = {"thinker": {"read_only": True}}
+
+class YoutubeIdeaRequestSerializer(serializers.Serializer):
+    youtube_url = serializers.URLField(required=True)
+    num_ideas = serializers.IntegerField(required=True, min_value=1, max_value=10)
