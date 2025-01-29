@@ -93,7 +93,7 @@ def thumb_and_title(youtube_url):
 
     title = thumb_response["items"][0]["snippet"]["title"]
 
-    return {thumbnail, title}
+    return [thumbnail, title]
     
 
 @api_view(['POST'])
@@ -111,7 +111,8 @@ def generate_ideas(request):
             print(transcript)
             return
         
-        print(thumb_and_title(youtube_url))
+        thumbnail = thumb_and_title(youtube_url)[0]
+        title = thumb_and_title(youtube_url)[1]
 
         # Configure Google Generative AI
         genai.configure(api_key=api_key)
@@ -121,13 +122,19 @@ def generate_ideas(request):
 
         ```json
         {{
+          "thumbnail": {thumbnail},
+          "video_title": {title}
           "summary": "summary of the core concept",
           "ideas": [
             {{
+              "thumbnail": {thumbnail},
+              "video_title": {title},
               "idea_title": "title of idea 1",
               "idea_content": "detailed description of idea 1"
             }},
             {{
+              "thumbnail": {thumbnail},
+              "video_title": {title},
               "idea_title": "title of idea 2",
               "idea_content": "detailed description of idea 2"
             }},

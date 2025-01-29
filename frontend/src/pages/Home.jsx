@@ -54,6 +54,8 @@ function Home() {
                 num_ideas: numIdeas,
             });
 
+            console.log(response)
+
 
             if (response.status === 200) {
                 const generatedIdeas = response.data.ideas;
