@@ -22,6 +22,8 @@ def get_transcript(youtube_url):
     except Exception as e:
         return f"An error occurred: {str(e)}"  # Return the error message
 
+get_transcript("https://www.youtube.com/watch?v=th5_9woFJmk&t=483s")
+
 def main():
     parser = argparse.ArgumentParser(description="Fetch and process YouTube transcript.")
     parser.add_argument("youtube_url", help="The URL of the YouTube video")
@@ -85,5 +87,5 @@ def main():
 
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
