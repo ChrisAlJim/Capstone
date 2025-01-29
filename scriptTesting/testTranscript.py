@@ -4,6 +4,8 @@ import argparse
 from youtube_transcript_api import YouTubeTranscriptApi
 from urllib.parse import urlparse, parse_qs
 import google.generativeai as genai
+from google.generativeai.types import GenerationConfig  # Import GenerationConfig
+import json
 
 def get_transcript(youtube_url):
     try:
@@ -19,6 +21,8 @@ def get_transcript(youtube_url):
 
     except Exception as e:
         return f"An error occurred: {str(e)}"  # Return the error message
+
+get_transcript("https://www.youtube.com/watch?v=th5_9woFJmk&t=483s")
 
 def main():
     parser = argparse.ArgumentParser(description="Fetch and process YouTube transcript.")
@@ -41,12 +45,24 @@ def main():
     genai.configure(api_key=api_key)
 
     prompt = f"""
-    Summarize the core concept explained in this YouTube transcript. Based on this concept, suggest 
+    Give a summary of the core concept explained in this YouTube transcript. Then, provide {num_of_ideas} practical activities, projects, or exercises that could help someone further explore or apply what they learned. These suggestions should be distinct from any examples in the video.  Format the response as a JSON object with the following structure:
 
+    ```json
+    {{
+      "summary": "summary of the core concept",
+      "ideas": [
+        {{
+          "idea_title": "title of idea 1",
+          "idea_content": "detailed description of idea 1"
+        }},
+        {{
+          "idea_title": "title of idea 2",
+          "idea_content": "detailed description of idea 2"
+        }},
+        // ... more ideas
+      ]
+    }}
     ```
-    {num_of_ideas} 
-    ```
-    practical activities, projects, or exercises that could help someone further explore or apply what they learned. These suggestions should be different from the examples (if any) shown in the video.
 
     Transcript:
     ```
@@ -55,8 +71,21 @@ def main():
     """
 
     model = genai.GenerativeModel("gemini-1.5-pro")
-    response = model.generate_content(prompt)
-    print(response.text)
+    response = model.generate_content(
+        prompt,
+        generation_config=GenerationConfig(response_mime_type="application/json") # No schema needed, rely on the prompt
+    )
 
-if __name__ == "__main__":
-    main()
+
+    try:
+        response_json = json.loads(response.text)  # Parse the JSON string
+        print(json.dumps(response_json, indent=2)) # Pretty print the JSON
+
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
+        print(f"Raw response: {response.text}") # Print the raw response for debugging
+
+
+
+# if __name__ == "__main__":
+#     main()

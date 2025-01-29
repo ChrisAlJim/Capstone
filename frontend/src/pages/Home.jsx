@@ -5,8 +5,9 @@ import "../styles/Home.css"
 
 function Home() {
     const [ideas, setIdeas] = useState([]);
-    const [content, setContent] = useState("");
-    const [title, setTitle] = useState("");
+    const [youtubeUrl, setYoutubeUrl] = useState("");
+    const [numIdeas, setNumIdeas] = useState(1);
+
 
     useEffect(() => {
         getIdeas();
@@ -34,17 +35,48 @@ function Home() {
             .catch((error) => alert(error));
     };
 
-    const createIdea = (e) => {
-        e.preventDefault();
+    const createIdea = ( title, content ) => {
         api
-            .post("/api/ideas/", { content, title })
+            .post("/api/ideas/", { title, content })
             .then((res) => {
-                if (res.status === 201) alert("Idea created!");
-                else alert("Failed to make idea.");
-                getIdeas();
+                if (res.status === 201) console.log("Idea created!");
+                else console.error("Failed to make idea.");
             })
             .catch((err) => alert(err));
     };
+
+
+    const generateIdeas = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await api.post("/api/generate-ideas/", {
+                youtube_url: youtubeUrl,
+                num_ideas: numIdeas,
+            });
+
+            console.log(response)
+
+
+            if (response.status === 200) {
+                const generatedIdeas = response.data.ideas;
+                generatedIdeas.forEach(async (idea) => {
+                    createIdea( idea.idea_title, idea.idea_content )
+                });
+                setYoutubeUrl("");
+                setNumIdeas(1);
+                getIdeas();
+                alert("Ideas generated!")
+            } else {
+                alert("Failed to generate ideas.");
+            }
+        } catch (err) {
+            alert(`An error occurred: ${err.message}`);
+            if (err.response && err.response.data) {
+              console.error("Server error details:", err.response.data);
+            }
+        }
+    };
+
 
     return (
         <div>
@@ -54,32 +86,33 @@ function Home() {
                     <Idea idea={idea} onDelete={deleteIdea} key={idea.id} />
                 ))}
             </div>
-            <h2>Create an Idea</h2>
-            <form onSubmit={createIdea}>
-                <label htmlFor="title">Title:</label>
-                <br />
+            <h2>Generate Ideas from YouTube</h2>
+            <form onSubmit={generateIdeas}>
+                <label htmlFor="youtubeUrl">YouTube URL:</label>
                 <input
                     type="text"
-                    id="title"
-                    name="title"
+                    id="youtubeUrl"
+                    value={youtubeUrl}
+                    onChange={(e) => setYoutubeUrl(e.target.value)}
                     required
-                    onChange={(e) => setTitle(e.target.value)}
-                    value={title}
                 />
-                <label htmlFor="content">Content:</label>
                 <br />
-                <textarea
-                    id="content"
-                    name="content"
+                <label htmlFor="numIdeas">Number of Ideas:</label>
+                <input
+                    type="number"
+                    id="numIdeas"
+                    value={numIdeas}
+                    onChange={(e) => setNumIdeas(parseInt(e.target.value, 10) || 1)}
+                    min="1"
+                    max="10"
                     required
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                ></textarea>
+                />
                 <br />
-                <input type="submit" value="Submit"></input>
+                <button type="submit">Generate</button>
             </form>
         </div>
     );
 }
+
 
 export default Home;
