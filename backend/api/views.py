@@ -117,7 +117,7 @@ def generate_ideas(request):
         genai.configure(api_key=api_key)
 
         prompt = f"""
-        Give a summary of the core concept explained in this YouTube transcript. Then, provide {num_ideas} practical activities, projects, or exercises that could help someone further explore or apply what they learned. These suggestions should be distinct from any examples in the video.  Format the response as a JSON object with the following structure:
+        Give a summary of the core concept explained in this YouTube transcript. Then, provide strictly {num_ideas} practical activities, projects, or exercises that could help someone further explore or apply what they learned. These suggestions should be distinct from any examples in the video.  Format the response as a JSON object with the following structure:
 
         ```json
         {{
@@ -142,7 +142,7 @@ def generate_ideas(request):
         ```
         """
 
-        model = genai.GenerativeModel("gemini-1.5-pro")
+        model = genai.GenerativeModel("gemini-1.5-flash-8b")
         response = model.generate_content(
             prompt,
             generation_config=GenerationConfig(response_mime_type="application/json")
