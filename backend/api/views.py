@@ -4,14 +4,16 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from .serializers import UserSerializer, IdeaSerializer, YoutubeIdeaRequestSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from youtube_transcript_api import YouTubeTranscriptApi
 from urllib.parse import urlparse, parse_qs
+from googleapiclient.discovery import build
 import google.generativeai as genai
 from google.generativeai.types import GenerationConfig  # Import GenerationConfig
 import json
 import environ
 from .models import Idea
+from operator import itemgetter
 
 # Create your views here.
 class IdeaListCreate(generics.ListCreateAPIView):
@@ -56,6 +58,43 @@ def get_transcript(youtube_url):
 
     except Exception as e:
         return f"An error occurred: {str(e)}"  # Return the error message
+    
+def thumb_and_title(youtube_url):
+    env = environ.Env()
+    api_key = env('YOUTUBE_API_KEY')
+    youtube = build('youtube', 'v3', developerKey=api_key)
+    
+    url_data = urlparse(youtube_url)
+    query = parse_qs(url_data.query)
+    video_id = query.get("v", [None])[0]
+
+    if not video_id:
+        return "Invalid YouTube URL. Please provide a URL with a valid video ID."
+        
+    thumb_request = youtube.videos().list(
+        part='snippet',
+        id=video_id
+    )
+
+    thumb_response=thumb_request.execute()
+
+    thumbnails = thumb_response["items"][0]["snippet"]["thumbnails"]
+
+    thumbnail = thumb_response["items"][0]["snippet"]["thumbnails"]["maxres"]["url"]
+
+    if "maxres" in thumbnails:
+        thumbnail = thumbnails["maxres"][0]
+    elif "high" in thumbnails:
+        thumbnail = thumbnails["high"][0]
+    elif "medium" in thumbnails:
+        thumbnail = thumbnails["medium"][0]
+    else:
+        thumbnail = thumbnails["default"][0]
+
+    title = thumb_response["items"][0]["snippet"]["title"]
+
+    return {thumbnail, title}
+    
 
 @api_view(['POST'])
 def generate_ideas(request):
@@ -71,6 +110,8 @@ def generate_ideas(request):
         if "An error occurred" in transcript or "Invalid YouTube URL" in transcript:
             print(transcript)
             return
+        
+        thumbnail, title = itemgetter("thumbnail", "title")(thumb_and_title(youtube_url))
 
         # Configure Google Generative AI
         genai.configure(api_key=api_key)
