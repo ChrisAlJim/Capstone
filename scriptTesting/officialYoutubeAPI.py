@@ -3,9 +3,9 @@ from environ import Env
 from urllib.parse import urlparse, parse_qs
 from youtube_transcript_api import YouTubeTranscriptApi
 
-
 env = Env()
 api_key = "" #Change api key before push!
+
 
 youtube = build('youtube', 'v3', developerKey=api_key)
 youtube_url = "https://www.youtube.com/watch?v=c-QsfbznSXI&t=3478s"
