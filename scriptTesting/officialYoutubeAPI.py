@@ -5,7 +5,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 
 
 env = Env()
-api_key = "AIzaSyC9mb8ZRUqLifAluBIbQ2wNH7ifmYIlc4I"
+api_key = "AIzaSyD3B7kzol5hY8NVM08t6a4ogKlnST_NKPk"
 
 youtube = build('youtube', 'v3', developerKey=api_key)
 youtube_url = "https://www.youtube.com/watch?v=c-QsfbznSXI&t=3478s"
@@ -16,26 +16,28 @@ video_id = query.get("v", [None])[0]  # Safely get the video ID
 # print(transcript)
 
 thumb_request = youtube.videos().list(
-    part='contentDetails',
+    part='snippet',
     id=video_id
 )
 
 thumb_response=thumb_request.execute()
-items = thumb_response["items"]
+items = thumb_response["items"][0]["snippet"]["thumbnails"]
 
 urls = items
 
 print(urls)
 
+caption_request = youtube.captions
 
-# # if "maxres" in urls:
-# #     print(urls["maxres"])
-# # elif "high" in urls:
-# #     print(urls["high"])
-# # elif "medium" in urls:
-# #     print(urls["medium"])
-# # else:
-# #     print(urls["default"])
+
+if "maxres" in urls:
+    print(urls["maxres"])
+elif "high" in urls:
+    print(urls["high"])
+elif "medium" in urls:
+    print(urls["medium"])
+else:
+    print(urls["default"])
 
 
 # for url in urls:
@@ -103,4 +105,4 @@ def get_transcript(youtube_url):
     except Exception as e:
         return f"An error occurred: {str(e)}"  # Return the error message
     
-# print(get_transcript("https://www.youtube.com/watch?v=308KoLSLlCc"))
+print(get_transcript("https://www.youtube.com/watch?v=308KoLSLlCc"))

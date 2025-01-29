@@ -80,16 +80,16 @@ def thumb_and_title(youtube_url):
 
     thumbnails = thumb_response["items"][0]["snippet"]["thumbnails"]
 
-    thumbnail = thumb_response["items"][0]["snippet"]["thumbnails"]["maxres"]["url"]
+    thumbnail = thumb_response["items"][0]["snippet"]["thumbnails"]
 
     if "maxres" in thumbnails:
-        thumbnail = thumbnails["maxres"][0]
+        thumbnail = thumbnails["maxres"]["url"]
     elif "high" in thumbnails:
-        thumbnail = thumbnails["high"][0]
+        thumbnail = thumbnails["high"]["url"]
     elif "medium" in thumbnails:
-        thumbnail = thumbnails["medium"][0]
+        thumbnail = thumbnails["medium"]["url"]
     else:
-        thumbnail = thumbnails["default"][0]
+        thumbnail = thumbnails["default"]["url"]
 
     title = thumb_response["items"][0]["snippet"]["title"]
 
@@ -111,7 +111,7 @@ def generate_ideas(request):
             print(transcript)
             return
         
-        thumbnail, title = itemgetter("thumbnail", "title")(thumb_and_title(youtube_url))
+        print(thumb_and_title(youtube_url))
 
         # Configure Google Generative AI
         genai.configure(api_key=api_key)
