@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../api";
 import Idea from "../components/Idea"
+import PrimarySearchAppBar from "../components/AppBar";
 import "../styles/Home.css"
 
 function Home() {
@@ -54,9 +55,6 @@ function Home() {
                 num_ideas: numIdeas,
             });
 
-            console.log(response)
-
-
             if (response.status === 200) {
                 const generatedIdeas = response.data.ideas;
                 generatedIdeas.forEach(async (idea) => {
@@ -79,7 +77,9 @@ function Home() {
 
 
     return (
+        
         <div>
+            <PrimarySearchAppBar/>
             <div>
                 <h2>Ideas</h2>
                 {ideas.map((idea) => (
