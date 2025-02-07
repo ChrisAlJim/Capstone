@@ -7,7 +7,7 @@ import "../styles/Home.css"
 function Home() {
     const [ideas, setIdeas] = useState([]);
     const [youtubeUrl, setYoutubeUrl] = useState("");
-    const [prompt, setPrompt] = useState("")
+    const [userPrompt, setUserPrompt] = useState("")
     const [numIdeas, setNumIdeas] = useState(1);
 
 
@@ -54,6 +54,7 @@ function Home() {
             const response = await api.post("/api/generate-ideas/", {
                 youtube_url: youtubeUrl,
                 num_ideas: numIdeas,
+                user_prompt: userPrompt,
             });
 
             if (response.status === 200) {
@@ -102,8 +103,8 @@ function Home() {
                 <input
                     type="text"
                     id="prompt"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
+                    value={userPrompt}
+                    onChange={(e) => setUserPrompt(e.target.value)}
                     max = "300"
                 />
                 <br />

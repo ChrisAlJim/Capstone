@@ -13,7 +13,6 @@ from google.generativeai.types import GenerationConfig  # Import GenerationConfi
 import json
 import environ
 from .models import Idea
-from operator import itemgetter
 
 # Create your views here.
 class IdeaListCreate(generics.ListCreateAPIView):
@@ -103,13 +102,15 @@ def generate_ideas(request):
         validated_data = serializer.validated_data
         youtube_url = validated_data['youtube_url']
         num_ideas = validated_data['num_ideas']
+        user_prompt = validated_data.get('user_prompt', '')
+        print(user_prompt)
         env = environ.Env()
         api_key = env('GOOGLE_API_KEY')
 
         transcript = get_transcript(youtube_url)
         if "An error occurred" in transcript or "Invalid YouTube URL" in transcript:
             print(transcript)
-            return
+            return Response({"error": transcript}, status=status.HTTP_400_BAD_REQUEST)
         
         thumbnail = thumb_and_title(youtube_url)[0]
         title = thumb_and_title(youtube_url)[1]
@@ -164,3 +165,6 @@ def generate_ideas(request):
             return Response(response_json, status=status.HTTP_200_OK)
         except json.JSONDecodeError as e:
             return Response({"error": f"Error decoding JSON: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    else:
+        print(serializer.errors)  # Log the errors for debugging
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
