@@ -7,6 +7,7 @@ import "../styles/Home.css"
 function Home() {
     const [ideas, setIdeas] = useState([]);
     const [youtubeUrl, setYoutubeUrl] = useState("");
+    const [prompt, setPrompt] = useState("")
     const [numIdeas, setNumIdeas] = useState(1);
 
 
@@ -95,6 +96,15 @@ function Home() {
                     value={youtubeUrl}
                     onChange={(e) => setYoutubeUrl(e.target.value)}
                     required
+                />
+                <br />
+                <label htmlFor="prompt">Prompt:</label>
+                <input
+                    type="text"
+                    id="prompt"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    max = "300"
                 />
                 <br />
                 <label htmlFor="numIdeas">Number of Ideas:</label>
