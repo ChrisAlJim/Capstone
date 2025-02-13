@@ -102,8 +102,7 @@ def generate_ideas(request):
         validated_data = serializer.validated_data
         youtube_url = validated_data['youtube_url']
         num_ideas = validated_data['num_ideas']
-        user_prompt = validated_data.get('user_prompt', '')
-        print(user_prompt)
+        print(validated_data)
         env = environ.Env()
         api_key = env('GOOGLE_API_KEY')
 
@@ -153,7 +152,37 @@ def generate_ideas(request):
         ```
         """
 
-        model = genai.GenerativeModel("gemini-2.0-flash-001")
+        if 'user_prompt' in validated_data:
+            prompt = f"""
+            Give a summary of the core concept explained in this YouTube transcript. 
+            Then, create {num_ideas} distinct practical activities, projects, or exercises to further explore or apply the concepts from the video. 
+            Do not repeat examples given in the video. 
+            Tailor the ideas to the user's prompt (`{validated_data['user_prompt']}`, e.g., beginner-friendly, specific subtopic). 
+            Format the response as a JSON object with the following structure:
+
+            ```json
+            {{
+                "thumbnail": "{thumbnail}",
+                "video_title": "{title}",
+                "summary": "summary of the core concept",
+                "ideas": [
+                    {{
+                        "thumbnail": {thumbnail},
+                        "video_title": {title},
+                        "idea_title": "title of idea 1",
+                        "idea_content": "detailed description of idea 1"
+                    }},
+                    {{
+                        "thumbnail": {thumbnail},
+                        "video_title": {title},
+                        "idea_title": "title of idea 2",
+                        "idea_content": "detailed description of idea 2"
+                    }}
+                ]
+            }}
+            """
+
+        model = genai.GenerativeModel("gemini-2.0-flash")
         response = model.generate_content(
             prompt,
             generation_config=GenerationConfig(response_mime_type="application/json")
@@ -166,5 +195,5 @@ def generate_ideas(request):
         except json.JSONDecodeError as e:
             return Response({"error": f"Error decoding JSON: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
-        print(serializer.errors)  # Log the errors for debugging
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -22,4 +22,4 @@ class IdeaSerializer(serializers.ModelSerializer):
 class YoutubeIdeaRequestSerializer(serializers.Serializer):
     youtube_url = serializers.URLField(required=True)
     num_ideas = serializers.IntegerField(required=True, min_value=1, max_value=10)
-    user_prompt = serializers.CharField(required=False, max_length=300, default="")
+    user_prompt = serializers.CharField(required=False, max_length=300)

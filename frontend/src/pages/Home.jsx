@@ -50,12 +50,18 @@ function Home() {
 
     const generateIdeas = async (e) => {
         e.preventDefault();
+
+        const requestData = {
+            youtube_url: youtubeUrl,
+            num_ideas: numIdeas,
+        }
+
+        if (userPrompt) {
+            requestData.user_prompt = userPrompt
+        }
+
         try {
-            const response = await api.post("/api/generate-ideas/", {
-                youtube_url: youtubeUrl,
-                num_ideas: numIdeas,
-                user_prompt: userPrompt,
-            });
+            const response = await api.post("/api/generate-ideas/", requestData);
 
             if (response.status === 200) {
                 const generatedIdeas = response.data.ideas;
